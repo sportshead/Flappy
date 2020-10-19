@@ -1,0 +1,15 @@
+{
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "target": "es5",
+    "outDir": "out/",
+    "module": "es6",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true
+  }
+}
