@@ -23,52 +23,58 @@ const webpack = require('webpack');
  */
 
 const TerserPlugin = require('terser-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.ts',
-  plugins: [new webpack.ProgressPlugin()],
+	mode: 'development',
+	entry: './src/index.ts',
+	plugins: [new webpack.ProgressPlugin(), new CopyPlugin({
+		patterns: ["src/index.html"]
+	})],
 
-  module: {
-    rules: [{
-      test: /\.(ts|tsx)$/,
-      loader: 'ts-loader',
-      include: [path.resolve(__dirname, 'src')],
-      exclude: [/node_modules/]
-    }, {
-      test: /.css$/,
+	module: {
+		rules: [
+			{
+				test: /\.(ts|tsx)$/,
+				loader: 'ts-loader',
+				include: [path.resolve(__dirname, 'src')],
+				exclude: [/node_modules/],
+			},
+			{
+				test: /.css$/,
 
-      use: [{
-        loader: "style-loader"
-      }, {
-        loader: "css-loader",
+				use: [
+					{
+						loader: 'style-loader',
+					},
+					{
+						loader: 'css-loader',
 
-        options: {
-          sourceMap: true
-        }
-      }]
-    }]
-  },
+						options: {
+							sourceMap: true,
+						},
+					},
+				],
+			},
+			{
+				test: /\.(png|jpe?g|gif)$/i,
+				use: [
+					{
+						loader: 'file-loader',
+						options: {
+							name: "[path]/[contenthash].[ext]"
+						}
+					},
+				],
+			},
+		],
+	},
 
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js']
-  },
+	resolve: {
+		extensions: ['.tsx', '.ts', '.js'],
+	},
 
-  optimization: {
-    minimizer: [new TerserPlugin()],
-
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          priority: -10,
-          test: /[\\/]node_modules[\\/]/
-        }
-      },
-
-      chunks: 'async',
-      minChunks: 1,
-      minSize: 30000,
-      name: true
-    }
-  }
-}
+	optimization: {
+		minimizer: [new TerserPlugin()],
+	},
+};

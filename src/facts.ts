@@ -12,6 +12,16 @@ export default class BirdFacts {
     }
 
     getFact(): string {
-        let key = Util.getRandomKey(BirdFacts.facts);
+        let key;
+        if (this.doneFacts.size === BirdFacts.facts.size) {
+            key = Util.getRandomKey(BirdFacts.facts);
+        } else {
+            do {
+                key = Util.getRandomKey(BirdFacts.facts);
+            } while (this.doneFacts.has(key));
+            this.doneFacts.add(key);
+        }
+
+        return <string>BirdFacts.facts.get(key);
     }
 }
