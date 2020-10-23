@@ -1,4 +1,4 @@
-import bg from "!!file-loader!./images/bg2.jpg";
+import bg from "!!file-loader!./images/bg.jpg";
 import bird from "!!file-loader!./images/bird.jpg";
 import Util from "./util";
 import Menus from "./menus";
