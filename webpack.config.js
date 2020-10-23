@@ -29,7 +29,7 @@ module.exports = {
 	mode: 'development',
 	entry: './src/index.ts',
 	plugins: [new webpack.ProgressPlugin(), new CopyPlugin({
-		patterns: ["src/index.html"]
+		patterns: ["src/index.html", "src/index.css"]
 	})],
 
 	module: {
@@ -40,7 +40,7 @@ module.exports = {
 				include: [path.resolve(__dirname, 'src')],
 				exclude: [/node_modules/],
 			},
-			{
+			/* {
 				test: /.css$/,
 
 				use: [
@@ -55,7 +55,7 @@ module.exports = {
 						},
 					},
 				],
-			},
+			}, */
 			{
 				test: /\.(png|jpe?g|gif)$/i,
 				use: [
