@@ -1,12 +1,15 @@
-import bg from "!!file-loader!./images/bg.jpg";
+import bg from "!!file-loader!./images/bg2.jpg";
 import bird from "!!file-loader!./images/bird.jpg";
 import Util from "./util";
 import Menus from "./menus";
+import Point2D from "./Point2D";
 
 const { LOG } = Util;
 
 const canvas = <HTMLCanvasElement>document.getElementById("main");
 export const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+
+export const BirdPos: Point2D = new Point2D();
 
 console.log(bg);
 console.log(bird);
