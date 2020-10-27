@@ -25,9 +25,28 @@ export default class Util {
         return img;
     }
 
+    /**
+     * @deprecated Use Logger.log instead.
+     */
     static LOG(message?: any, ...optionalParams: any[]): void {
         if (process.env.NODE_ENV === "production") {
             console.log(message, ...optionalParams);
+        }
+    }
+
+    static putIfAbsentSet<T>(set: Set<T>, value: T) {
+        if (set.has(value)) {
+            return value;
+        } else {
+            set.add(value);
+        }
+    }
+
+    static putIfAbsentMap<K, V>(map: Map<K, V>, key: K, value: V) {
+        if (map.has(key)) {
+            return map.get(key);
+        } else {
+            map.set(key, value);
         }
     }
 }

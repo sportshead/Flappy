@@ -86,6 +86,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/anymatch@npm:*":
+  version: 1.3.1
+  resolution: "@types/anymatch@npm:1.3.1"
+  checksum: 1647865e528a168f66f57a077e9651c10a4c172b656cc3686fddf176555d42ca0a1647bfc626ea2fceb68fc7701426ab708224be1762b4a5216fe8368ffdba3c
+  languageName: node
+  linkType: hard
+
+"@types/copy-webpack-plugin@npm:^6":
+  version: 6.0.0
+  resolution: "@types/copy-webpack-plugin@npm:6.0.0"
+  dependencies:
+    "@types/node": "*"
+    "@types/webpack": "*"
+  checksum: f0b256cea33d31f6aff4baec66bb746a1e65fcc3e6cdc075ef1dd196c286b61fc0cab6ed349fefa5db5ca51c87e140ca1a198d63cbc4a56cd783ddb3d3b749ca
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.0":
   version: 3.7.0
   resolution: "@types/eslint-scope@npm:3.7.0"
@@ -124,6 +141,54 @@ __metadata:
   version: 14.11.10
   resolution: "@types/node@npm:14.11.10"
   checksum: 74c50cfd07b5e4bbc4303c063acf8524048f5035161f009ea2ceeb12001d278fd43a1e399d03f6277caa5c67c61a785bf406f0541b8fc2252e1bcaaa2f2d414b
+  languageName: node
+  linkType: hard
+
+"@types/source-list-map@npm:*":
+  version: 0.1.2
+  resolution: "@types/source-list-map@npm:0.1.2"
+  checksum: 191f0e3b056b481e7a0bbb38f3d5b54b015556e38075726ca2637a35d3694df85cd16761b1b188729ac687a55aec3cbc2b07033ac090bcc13efe09ad10a3e935
+  languageName: node
+  linkType: hard
+
+"@types/tapable@npm:*":
+  version: 1.0.6
+  resolution: "@types/tapable@npm:1.0.6"
+  checksum: 01709a2f8dbea665a39c008ba6995c76210fabb52434815e7632c7fff22ecad1dd49a1d75b8f5b2e9b365c6d7a6407127bed834587df4777b800110c2a74fc36
+  languageName: node
+  linkType: hard
+
+"@types/uglify-js@npm:*":
+  version: 3.11.0
+  resolution: "@types/uglify-js@npm:3.11.0"
+  dependencies:
+    source-map: ^0.6.1
+  checksum: ee62336f5a373cade9e0deeaed64d3ae689e8342ad196dd9744f7c39179668ff8f9781371fd7a13041611e248f6287abe4813f582567908caf96a17209ab31d8
+  languageName: node
+  linkType: hard
+
+"@types/webpack-sources@npm:*":
+  version: 2.0.0
+  resolution: "@types/webpack-sources@npm:2.0.0"
+  dependencies:
+    "@types/node": "*"
+    "@types/source-list-map": "*"
+    source-map: ^0.7.3
+  checksum: 90bb9ca408bb366f71e40136f92b1db8232981993022f94cbb7b962a2b1c1a34c4d9ae1b2242f9b29b9d04d5579539f41b477a77f8968b161d4bb8c3bec33f8a
+  languageName: node
+  linkType: hard
+
+"@types/webpack@npm:*":
+  version: 4.41.23
+  resolution: "@types/webpack@npm:4.41.23"
+  dependencies:
+    "@types/anymatch": "*"
+    "@types/node": "*"
+    "@types/tapable": "*"
+    "@types/uglify-js": "*"
+    "@types/webpack-sources": "*"
+    source-map: ^0.6.0
+  checksum: 6ac67beaa88bc23e86c760958669d2739b643b13d624658820f3cdbcab83a9d34a9949faea75de73edcf4df78f9a8480885848ed7e4c82789d2a5bb94fc9478b
   languageName: node
   linkType: hard
 
@@ -1240,6 +1305,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flappy@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "flappy@workspace:."
+  dependencies:
+    "@types/copy-webpack-plugin": ^6
+    "@typescript-eslint/eslint-plugin": ^4.4.1
+    "@typescript-eslint/parser": ^4.4.1
+    babel-plugin-syntax-dynamic-import: ^6.18.0
+    copy-webpack-plugin: ^6.2.1
+    eslint: ^7.11.0
+    file-loader: ^6.1.1
+    prettier: ^2.1.2
+    terser-webpack-plugin: ^5.0.0
+    ts-loader: ^8.0.6
+    typescript: ^4.0.3
+    webpack: ^5.1.3
+    webpack-cli: ^4.1.0
+  languageName: unknown
+  linkType: soft
+
 "flat-cache@npm:^2.0.1":
   version: 2.0.1
   resolution: "flat-cache@npm:2.0.1"
@@ -1795,25 +1880,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"my-webpack-project@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "my-webpack-project@workspace:."
-  dependencies:
-    "@typescript-eslint/eslint-plugin": ^4.4.1
-    "@typescript-eslint/parser": ^4.4.1
-    babel-plugin-syntax-dynamic-import: ^6.18.0
-    copy-webpack-plugin: ^6.2.1
-    eslint: ^7.11.0
-    file-loader: ^6.1.1
-    prettier: ^2.1.2
-    terser-webpack-plugin: ^5.0.0
-    ts-loader: ^8.0.6
-    typescript: ^4.0.3
-    webpack: ^5.1.3
-    webpack-cli: ^4.1.0
-  languageName: unknown
-  linkType: soft
-
 "natural-compare@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare@npm:1.4.0"
@@ -2288,7 +2354,7 @@ resolve@^1.9.0:
   languageName: node
   linkType: hard
 
-"source-map@npm:~0.7.2":
+"source-map@npm:^0.7.3, source-map@npm:~0.7.2":
   version: 0.7.3
   resolution: "source-map@npm:0.7.3"
   checksum: 351ce26ffa1ebf203660c0d70d7566c81e65d2d994d1c2d94da140808e02da34961673ce12ecea9b40797b96fbeb8c70bf71a4ad9f779f1a4fdbba75530bb386

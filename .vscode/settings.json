@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
-    "Eventable"
+    "Eventable",
+    "LEVELSET"
   ],
   "search.exclude": {
     "**/.yarn": true,

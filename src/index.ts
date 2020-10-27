@@ -1,20 +1,43 @@
 import bg from "!!file-loader!./images/bg.jpg";
-import bird from "!!file-loader!./images/bird.jpg";
+import bird from "!!file-loader!./images/bird.png";
+import bird_up from "!!file-loader!./images/bird_up.png";
+import bird_down from "!!file-loader!./images/bird_down.png";
+import pipe from "!!file-loader!./images/pipe.png";
+import pipe_up from "!!file-loader!./images/pipe_up.png";
+import pipe_down from "!!file-loader!./images/pipe_down.png";
 import Util from "./util";
-import Menus from "./menus";
-import Point2D from "./Point2D";
+import Menus from "./ui/menus";
+import Logger, { AlertLogOutput, ConsoleLogOutput, Level } from "./Logger";
+import CancellationTokenSource, {
+    CancellationToken,
+} from "./CancellationTokenSource";
+import getCursorPosition from "./canvas/getCursorPosition";
+import Rect2D from "./canvas/Rect2D";
 
-const { LOG } = Util;
+export const logger = new Logger(
+    new ConsoleLogOutput(
+        process.env.NODE_ENV === "production" ? Level.OFF : Level.ALL,
+        Level.WARN,
+        Level.ERROR
+    ),
+    new AlertLogOutput(
+        process.env.NODE_ENV === "production" ? Level.OFF : Level.FATAL
+    )
+);
 
 const canvas = <HTMLCanvasElement>document.getElementById("main");
-export const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 
-export const BirdPos: Point2D = new Point2D();
-
-console.log(bg);
-console.log(bird);
+export const Bird: Rect2D = new Rect2D(0, 50, 32, 32);
+const gravity = 0.5; // gravity in pixels/frame, 60 fps
+const jumpHeight = 1.5; // pixels/frame
+const floorY = 475;
+let jumpCountDown = 0; // frames
+const pipeEnd = 44; // pixels
 
 const images: Map<string, HTMLImageElement> = new Map();
+
+let JumpCST: CancellationTokenSource;
 
 async function main() {
     const pressStart = new FontFace(
@@ -23,19 +46,88 @@ async function main() {
     );
 
     document.fonts.add(await pressStart.load());
-    LOG("font loaded");
+
+    logger.log(Level.INFO, "font loaded");
 
     images.set("bg", await Util.getImage(bg));
-    LOG("bg loaded");
-    images.set("bird", await Util.getImage(bird));
-    LOG("bird loaded");
+    logger.log(Level.INFO, "bg loaded");
 
-    await Menus.MainMenu();
+    images.set("bird", await Util.getImage(bird));
+    logger.log(Level.INFO, "bird loaded");
+    images.set("bird_up", await Util.getImage(bird_up));
+    logger.log(Level.INFO, "bird_up loaded");
+    images.set("bird_down", await Util.getImage(bird_down));
+    logger.log(Level.INFO, "bird_down loaded");
+
+    images.set("pipe", await Util.getImage(pipe));
+    logger.log(Level.INFO, "pipe loaded");
+    images.set("pipe_up", await Util.getImage(pipe_up));
+    logger.log(Level.INFO, "pipe_up loaded");
+    images.set("pipe_down", await Util.getImage(pipe_down));
+    logger.log(Level.INFO, "pipe_down loaded");
+
+    canvas.addEventListener("click", (e) => {
+        const click = getCursorPosition(canvas, e);
+        logger.log(Level.DEBUG, `Click detected at `, click);
+    });
+    logger.log(Level.TRACE, "Click listener added.");
+
+    await Menus.MainMenu(ctx);
+
+    JumpCST = new CancellationTokenSource();
+    bindJump(JumpCST.getToken());
+
+    window.requestAnimationFrame(draw);
 }
 main().catch(console.error);
 
+function bindJump(token: CancellationToken) {
+    canvas.addEventListener("click", (e: MouseEvent) => {
+        if (token.isCancellationRequested()) {
+            return;
+        }
+        e.preventDefault();
+        logger.log(Level.TRACE, "Jumped");
+        jumpCountDown = 30;
+    });
+    document.body.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (token.isCancellationRequested() || e.repeat) {
+            return;
+        }
+        logger.log(Level.TRACE, "Jumped");
+        jumpCountDown = 30;
+    });
+}
+
+function draw() {
+    if (Bird.y + Bird.height >= floorY) {
+        logger.log(Level.INFO, "game over, reason: floor");
+        return gameOver();
+    }
+    reset();
+
+    if (Bird.y < 0) {
+        Bird.y = 0;
+    }
+
+    if (--jumpCountDown >= 15) {
+        ctx.drawImage(images.get("bird_up"), 20, Bird.y);
+        Bird.y -= jumpHeight;
+    } else if (jumpCountDown > 0) {
+        ctx.drawImage(images.get("bird"), 20, Bird.y);
+        Bird.y -= jumpHeight;
+    } else {
+        ctx.drawImage(images.get("bird_down"), 20, Bird.y);
+        Bird.y += gravity;
+    }
+
+    window.requestAnimationFrame(draw);
+}
+
 export function reset() {
     ctx.drawImage(images.get("bg"), 0, 0, 256, 512);
+}
 
-    LOG("canvas resetted");
+function gameOver() {
+    JumpCST.cancel();
 }

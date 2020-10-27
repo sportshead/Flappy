@@ -24,13 +24,13 @@ const webpack = require('webpack');
 
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-
 module.exports = {
 	mode: 'development',
 	entry: './src/index.ts',
 	plugins: [new webpack.ProgressPlugin(), new CopyPlugin({
-		patterns: ["src/index.html", "src/index.css"]
+		patterns: ["src/index.html", "src/index.css", { from: "src/images/bird.png", to: "favicon.png" }]
 	})],
+	devtool: "eval",
 
 	module: {
 		rules: [
