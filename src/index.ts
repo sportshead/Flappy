@@ -18,6 +18,7 @@ import Pipe, { PipeConstants } from "./Pipe";
 export const logger = new Logger(
     new ConsoleLogOutput(
         process.env.NODE_ENV === "production" ? Level.OFF : Level.ALL,
+        process.env.NODE_ENV === "production" ? Level.OFF : Level.INFO,
         Level.WARN,
         Level.ERROR
     ),

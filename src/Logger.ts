@@ -130,12 +130,16 @@ export interface LogOutput {
 }
 
 export class ConsoleLogOutput implements LogOutput {
-    static readonly VERSION = "1.0.0";
+    static readonly VERSION = "1.1.0";
     constructor(
-        private readonly logThreshold: number | Level = Level.ALL,
+        private readonly debugThreshold: number | Level = Level.ALL,
+        private readonly logThreshold: number | Level = Level.INFO,
         private readonly warningThreshold: number | Level = Level.WARN,
         private readonly errorThreshold: number | Level = Level.ERROR
     ) {
+        if (this.debugThreshold instanceof Level) {
+            this.debugThreshold = this.debugThreshold.intLevel();
+        }
         if (this.logThreshold instanceof Level) {
             this.logThreshold = this.logThreshold.intLevel();
         }
@@ -166,6 +170,11 @@ export class ConsoleLogOutput implements LogOutput {
             );
         } else if (level.intLevel() <= this.logThreshold) {
             console.log(
+                `[${time.toISOString()}] [${level.name}]:`,
+                ...messages
+            );
+        } else if (level.intLevel() <= this.debugThreshold) {
+            console.debug(
                 `[${time.toISOString()}] [${level.name}]:`,
                 ...messages
             );
