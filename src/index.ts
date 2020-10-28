@@ -13,8 +13,7 @@ import CancellationTokenSource, {
 } from "./CancellationTokenSource";
 import getCursorPosition from "./canvas/getCursorPosition";
 import Rect2D from "./canvas/Rect2D";
-import Pipe from "./Pipe";
-import detectRectCollision from "./canvas/collision";
+import Pipe, { PipeConstants } from "./Pipe";
 
 export const logger = new Logger(
     new ConsoleLogOutput(
@@ -31,16 +30,18 @@ const canvas = <HTMLCanvasElement>document.getElementById("main");
 const ctx = canvas.getContext("2d");
 
 export const Bird: Rect2D = new Rect2D(0, 50, 32, 32);
-const gravity = 0.75; // gravity in pixels/frame, 60 fps
+const gravity = 1; // gravity in pixels/frame, 60 fps
 const jumpHeight = 1; // pixels/frame
 export const floorY = 475;
 let jumpCountDown = 0; // frames
 let pipeCooldown = 300; // frames, initialize with 5 secs
 const scrollX = 1; // pixels/frame
 
-const pipes: Pipe[] = [new Pipe(200, 200)];
+const pipes: Pipe[] = [];
 
 export const images: Map<string, HTMLImageElement> = new Map();
+
+export let score = 0;
 
 let JumpCST: CancellationTokenSource;
 
@@ -128,22 +129,27 @@ function draw() {
     }
 
     if (--pipeCooldown <= 0) {
-        pipeCooldown = 60; // frames = 0.5 secs
-        pipes.push(new Pipe(1000, Util.randomInt(floorY - 64, 64)));
+        pipeCooldown = 120; // frames = 1 secs
+        pipes.push(new Pipe(1000, Util.randomInt(floorY - 128, 64)));
     }
 
-    pipes.forEach((pipe) => {
-        pipe.x -= scrollX;
-        pipe.render(ctx);
+    const deleteIndexes = [];
+    for (let i = 0; i < pipes.length; i++) {
+        const pipe = pipes[i];
+        pipe.scroll(scrollX);
+        if (pipe.x + PipeConstants.PIPE_WIDTH <= -10) {
+            deleteIndexes.push(i);
+            continue;
+        }
         if (pipe.inFrame(canvas)) {
+            pipe.render(ctx);
             // collision detection
-            if (
-                detectRectCollision(Bird, pipe.top) ||
-                detectRectCollision(Bird, pipe.bottom)
-            ) {
+            if (pipe.detectCollision(Bird, -10)) {
+                logger.log(Level.INFO, "game over, reason: pipe");
+                return gameOver();
             }
         }
-    });
+    }
 
     window.requestAnimationFrame(draw);
 }

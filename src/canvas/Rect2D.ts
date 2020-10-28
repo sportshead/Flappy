@@ -48,4 +48,32 @@ export default class Rect2D extends Point2D {
         }
         return this;
     }
+
+    toArray(): [x: number, y: number, width: number, height: number] {
+        return [this.x, this.y, this.width, this.height];
+    }
+
+    render(
+        ctx: CanvasRenderingContext2D,
+        fill: boolean | (string | CanvasGradient | CanvasPattern) = true,
+        stroke: boolean | (string | CanvasGradient | CanvasPattern) = false
+    ) {
+        if (typeof fill !== "boolean") {
+            ctx.fillStyle = fill;
+            fill = true;
+        }
+        if (typeof stroke !== "boolean") {
+            ctx.strokeStyle = stroke;
+            stroke = true;
+        }
+        ctx.beginPath();
+        ctx.rect(...this.toArray());
+        ctx.closePath();
+        if (fill) {
+            ctx.fill();
+        }
+        if (stroke) {
+            ctx.stroke();
+        }
+    }
 }
