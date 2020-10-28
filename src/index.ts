@@ -13,6 +13,8 @@ import CancellationTokenSource, {
 } from "./CancellationTokenSource";
 import getCursorPosition from "./canvas/getCursorPosition";
 import Rect2D from "./canvas/Rect2D";
+import Pipe from "./Pipe";
+import detectRectCollision from "./canvas/collision";
 
 export const logger = new Logger(
     new ConsoleLogOutput(
@@ -29,13 +31,16 @@ const canvas = <HTMLCanvasElement>document.getElementById("main");
 const ctx = canvas.getContext("2d");
 
 export const Bird: Rect2D = new Rect2D(0, 50, 32, 32);
-const gravity = 0.5; // gravity in pixels/frame, 60 fps
-const jumpHeight = 1.5; // pixels/frame
-const floorY = 475;
+const gravity = 0.75; // gravity in pixels/frame, 60 fps
+const jumpHeight = 1; // pixels/frame
+export const floorY = 475;
 let jumpCountDown = 0; // frames
-const pipeEnd = 44; // pixels
+let pipeCooldown = 300; // frames, initialize with 5 secs
+const scrollX = 1; // pixels/frame
 
-const images: Map<string, HTMLImageElement> = new Map();
+const pipes: Pipe[] = [new Pipe(200, 200)];
+
+export const images: Map<string, HTMLImageElement> = new Map();
 
 let JumpCST: CancellationTokenSource;
 
@@ -88,14 +93,14 @@ function bindJump(token: CancellationToken) {
         }
         e.preventDefault();
         logger.log(Level.TRACE, "Jumped");
-        jumpCountDown = 30;
+        jumpCountDown = 20;
     });
     document.body.addEventListener("keydown", (e: KeyboardEvent) => {
-        if (token.isCancellationRequested() || e.repeat) {
+        if (token.isCancellationRequested()) {
             return;
         }
         logger.log(Level.TRACE, "Jumped");
-        jumpCountDown = 30;
+        jumpCountDown = 20;
     });
 }
 
@@ -104,13 +109,14 @@ function draw() {
         logger.log(Level.INFO, "game over, reason: floor");
         return gameOver();
     }
+
     reset();
 
     if (Bird.y < 0) {
         Bird.y = 0;
     }
 
-    if (--jumpCountDown >= 15) {
+    if (--jumpCountDown >= 10) {
         ctx.drawImage(images.get("bird_up"), 20, Bird.y);
         Bird.y -= jumpHeight;
     } else if (jumpCountDown > 0) {
@@ -120,6 +126,24 @@ function draw() {
         ctx.drawImage(images.get("bird_down"), 20, Bird.y);
         Bird.y += gravity;
     }
+
+    if (--pipeCooldown <= 0) {
+        pipeCooldown = 60; // frames = 0.5 secs
+        pipes.push(new Pipe(1000, Util.randomInt(floorY - 64, 64)));
+    }
+
+    pipes.forEach((pipe) => {
+        pipe.x -= scrollX;
+        pipe.render(ctx);
+        if (pipe.inFrame(canvas)) {
+            // collision detection
+            if (
+                detectRectCollision(Bird, pipe.top) ||
+                detectRectCollision(Bird, pipe.bottom)
+            ) {
+            }
+        }
+    });
 
     window.requestAnimationFrame(draw);
 }

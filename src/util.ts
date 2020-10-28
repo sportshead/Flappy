@@ -49,6 +49,14 @@ export default class Util {
             map.set(key, value);
         }
     }
+
+    static random(max: number, min: number = 0) {
+        return Math.random() * (max - min) + min;
+    }
+
+    static randomInt(max: number, min: number = 0) {
+        return ~~this.random(~~max, ~~min);
+    }
 }
 
 export interface Eventable {

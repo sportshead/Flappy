@@ -8,12 +8,18 @@ export default class Point2D {
         if (typeof arg1 === "number") {
             this.x = arg1;
             this.y = arg2;
+
+            this.init();
         } else if (arg1 instanceof Point2D) {
             const { x, y } = arg1;
             this.x = x;
             this.y = y;
+
+            this.init();
         }
     }
+
+    init() {}
 
     set(...args: [point: Point2D] | [x: number, y: number]): Point2D {
         if (typeof args[0] === "number") {

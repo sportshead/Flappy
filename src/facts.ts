@@ -22,6 +22,6 @@ export default class BirdFacts {
             this.doneFacts.add(key);
         }
 
-        return <string>BirdFacts.facts.get(key);
+        return BirdFacts.facts.get(key);
     }
 }
