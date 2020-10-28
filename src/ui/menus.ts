@@ -1,7 +1,9 @@
 import CancellationTokenSource from "../CancellationTokenSource";
 import Rect2D from "../canvas/Rect2D";
 import Size2D from "../canvas/Size2D";
-import { reset } from "../index";
+import { Bird, images, logger, pipes, reset, score } from "../index";
+import { Level } from "../Logger";
+import { PipeConstants } from "../Pipe";
 import Button from "./button";
 
 export default class Menus {
@@ -53,5 +55,54 @@ export default class Menus {
         } else {
             return await this.MainMenu(ctx);
         } */
+    }
+
+    static async GameOverMenu(ctx: CanvasRenderingContext2D): Promise<void> {
+        reset();
+
+        for (let i = 0; i < pipes.length; i++) {
+            const pipe = pipes[i];
+            if (pipe.inFrame(ctx.canvas)) {
+                pipe.render(ctx);
+            }
+        }
+
+        ctx.drawImage(images.get("bird"), Bird.x, Bird.y);
+
+        const cts = new CancellationTokenSource();
+
+        const playAgain = new Button(
+            new Rect2D(20, 220, 220, 50),
+            "PLAY AGAIN",
+            "playAgain",
+            5,
+            "black",
+            "blue",
+            "20px",
+            new Size2D(10, 35)
+        );
+
+        const share = new Button(
+            new Rect2D(30, 310, 200, 50),
+            "SHARE",
+            "share",
+            5,
+            "black",
+            "blue",
+            "35px",
+            new Size2D(15, 45)
+        );
+
+        const pressed = await Promise.race([
+            playAgain.render(ctx, cts.getToken()),
+            share.render(ctx, cts.getToken()),
+        ]);
+
+        if (pressed === "playAgain") {
+            return;
+        } else if (pressed === "share") {
+            // figure out how to share it
+            return;
+        }
     }
 }

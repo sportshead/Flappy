@@ -62,7 +62,7 @@ export default class Pipe extends Point2D {
     bottom: Rect2D;
     bottomPipe: Rect2D;
 
-    passedThrough: false;
+    passedThrough: boolean = false;
 
     inFrame(canvas: HTMLCanvasElement): boolean {
         return this.x <= canvas.width;

@@ -30,7 +30,7 @@ export const logger = new Logger(
 const canvas = <HTMLCanvasElement>document.getElementById("main");
 const ctx = canvas.getContext("2d");
 
-export const Bird: Rect2D = new Rect2D(0, 50, 32, 32);
+export const Bird: Rect2D = new Rect2D(20, 50, 32, 32);
 const gravity = 1; // gravity in pixels/frame, 60 fps
 const jumpHeight = 1; // pixels/frame
 export const floorY = 475;
@@ -38,7 +38,7 @@ let jumpCountDown = 0; // frames
 let pipeCooldown = 300; // frames, initialize with 5 secs
 const scrollX = 1; // pixels/frame
 
-const pipes: Pipe[] = [];
+export const pipes: Pipe[] = [];
 
 export const images: Map<string, HTMLImageElement> = new Map();
 
@@ -118,23 +118,13 @@ function draw() {
         Bird.y = 0;
     }
 
-    if (--jumpCountDown >= 10) {
-        ctx.drawImage(images.get("bird_up"), 20, Bird.y);
-        Bird.y -= jumpHeight;
-    } else if (jumpCountDown > 0) {
-        ctx.drawImage(images.get("bird"), 20, Bird.y);
-        Bird.y -= jumpHeight;
-    } else {
-        ctx.drawImage(images.get("bird_down"), 20, Bird.y);
-        Bird.y += gravity;
-    }
-
     if (--pipeCooldown <= 0) {
         pipeCooldown = 120; // frames = 1 secs
         pipes.push(new Pipe(1000, Util.randomInt(floorY - 128, 64)));
     }
 
     const deleteIndexes = [];
+    let ded = false; // to draw all the pipes
     for (let i = 0; i < pipes.length; i++) {
         const pipe = pipes[i];
         pipe.scroll(scrollX);
@@ -147,9 +137,38 @@ function draw() {
             // collision detection
             if (pipe.detectCollision(Bird, -10)) {
                 logger.log(Level.INFO, "game over, reason: pipe");
-                return gameOver();
+                ded = true;
+            }
+            if (!pipe.passedThrough && Bird.x > pipe.x + PipeConstants.WIDTH) {
+                logger.log(Level.INFO, "Score increased");
+                score++;
+                pipe.passedThrough = true;
             }
         }
+    }
+
+    ctx.fillStyle = "black";
+    ctx.font = "50px PressStart2P";
+    ctx.fillText(
+        score.toString(),
+        canvas.width / 2 - (score.toString().length * 50) / 2, // big brain
+        100
+    );
+
+    // draw bird on top of pipes
+    if (--jumpCountDown >= 10) {
+        ctx.drawImage(images.get("bird_up"), Bird.x, Bird.y);
+        Bird.y -= jumpHeight;
+    } else if (jumpCountDown > 0) {
+        ctx.drawImage(images.get("bird"), Bird.x, Bird.y);
+        Bird.y -= jumpHeight;
+    } else {
+        ctx.drawImage(images.get("bird_down"), Bird.x, Bird.y);
+        Bird.y += gravity;
+    }
+
+    if (ded) {
+        return gameOver();
     }
 
     window.requestAnimationFrame(draw);
@@ -161,4 +180,6 @@ export function reset() {
 
 function gameOver() {
     JumpCST.cancel();
+
+    Menus.GameOverMenu(ctx);
 }

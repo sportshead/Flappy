@@ -37,7 +37,7 @@ export default class CancellationTokenSource {
         return this._token.isCancellationRequested();
     }
 
-    getToken(): CancellationTokenImplementation {
+    getToken(): CancellationToken {
         return this._token;
     }
 
