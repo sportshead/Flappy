@@ -57,6 +57,10 @@ export default class Util {
     static randomInt(max: number, min: number = 0) {
         return ~~this.random(~~max, ~~min);
     }
+
+    static center(str: string, canvas: HTMLCanvasElement, fontSize: number) {
+        return canvas.width / 2 - (str.length * fontSize) / 2; // big brain
+    }
 }
 
 export interface Eventable {

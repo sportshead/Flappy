@@ -151,7 +151,7 @@ function draw() {
     ctx.font = "50px PressStart2P";
     ctx.fillText(
         score.toString(),
-        canvas.width / 2 - (score.toString().length * 50) / 2, // big brain
+        Util.center(score.toString(), canvas, 50),
         100
     );
 
@@ -181,5 +181,23 @@ export function reset() {
 function gameOver() {
     JumpCST.cancel();
 
-    Menus.GameOverMenu(ctx);
+    Menus.GameOverMenu(ctx).then(() => {
+        logger.log(Level.INFO, "Game restarted, resetting variables...");
+
+        Bird.set(new Rect2D(20, 50, 32, 32));
+
+        jumpCountDown = 0; // frames
+        pipeCooldown = 300; // frames, initialize with 5 secs
+
+        score = 0;
+
+        pipes.length = 0;
+
+        JumpCST = new CancellationTokenSource();
+        bindJump(JumpCST.getToken());
+
+        logger.log(Level.INFO, "Game restarted successfully.");
+
+        window.requestAnimationFrame(draw);
+    });
 }
