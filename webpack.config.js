@@ -77,4 +77,8 @@ module.exports = {
 	optimization: {
 		minimizer: [new TerserPlugin()],
 	},
+
+	stats: {
+		orphanModules: true
+	}
 };

@@ -32,10 +32,11 @@ const ctx = canvas.getContext("2d");
 
 export const Bird: Rect2D = new Rect2D(20, 50, 32, 32);
 const gravity = 1; // gravity in pixels/frame, 60 fps
-const jumpHeight = 1; // pixels/frame
+const jumpHeight = 1.5; // pixels/frame
 export const floorY = 475;
 let jumpCountDown = 0; // frames
-let pipeCooldown = 300; // frames, initialize with 5 secs
+let jumping = false;
+let pipeCooldown = 0; // frames
 const scrollX = 1; // pixels/frame
 
 export const pipes: Pipe[] = [];
@@ -79,6 +80,11 @@ async function main() {
     });
     logger.log(Level.TRACE, "Click listener added.");
 
+    canvas.addEventListener("selectstart", (e) => {
+        e.preventDefault();
+    });
+    logger.log(Level.TRACE, "Selection disabled.");
+
     await Menus.MainMenu(ctx);
 
     JumpCST = new CancellationTokenSource();
@@ -101,8 +107,43 @@ function bindJump(token: CancellationToken) {
         if (token.isCancellationRequested()) {
             return;
         }
-        logger.log(Level.TRACE, "Jumped");
-        jumpCountDown = 20;
+        if (e.key !== "Space") {
+            logger.log(Level.TRACE, "Jumping");
+            jumping = true;
+        }
+    });
+    document.body.addEventListener("keyup", (e: KeyboardEvent) => {
+        if (token.isCancellationRequested()) {
+            return;
+        }
+        if (e.key !== "Space") {
+            logger.log(Level.TRACE, "Stopped jumping");
+            jumping = false;
+        }
+    });
+    canvas.addEventListener("touchstart", (e) => {
+        if (token.isCancellationRequested()) {
+            return;
+        }
+        e.preventDefault();
+        logger.log(Level.TRACE, "Jumping");
+        jumping = true;
+    });
+    canvas.addEventListener("touchend", (e) => {
+        if (token.isCancellationRequested()) {
+            return;
+        }
+        e.preventDefault();
+        logger.log(Level.TRACE, "Stopped jumping");
+        jumping = false;
+    });
+    canvas.addEventListener("touchcancel", (e) => {
+        if (token.isCancellationRequested()) {
+            return;
+        }
+        e.preventDefault();
+        logger.log(Level.TRACE, "Stopped jumping");
+        jumping = false;
     });
 }
 
@@ -119,8 +160,8 @@ function draw() {
     }
 
     if (--pipeCooldown <= 0) {
-        pipeCooldown = 120; // frames = 1 secs
-        pipes.push(new Pipe(1000, Util.randomInt(floorY - 128, 64)));
+        pipeCooldown = 150; // frames = 2 secs
+        pipes.push(new Pipe(600, Util.randomInt(floorY - 128, 128)));
     }
 
     const deleteIndexes = [];
@@ -187,7 +228,7 @@ function gameOver() {
         Bird.set(new Rect2D(20, 50, 32, 32));
 
         jumpCountDown = 0; // frames
-        pipeCooldown = 300; // frames, initialize with 5 secs
+        pipeCooldown = 0; // frames
 
         score = 0;
 
@@ -201,3 +242,5 @@ function gameOver() {
         window.requestAnimationFrame(draw);
     });
 }
+
+logger.log(Level.INFO, window.isSecureContext);
