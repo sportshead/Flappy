@@ -25,15 +25,6 @@ export default class Util {
         return img;
     }
 
-    /**
-     * @deprecated Use Logger.log instead.
-     */
-    static LOG(message?: any, ...optionalParams: any[]): void {
-        if (process.env.NODE_ENV === "production") {
-            console.log(message, ...optionalParams);
-        }
-    }
-
     static putIfAbsentSet<T>(set: Set<T>, value: T) {
         if (set.has(value)) {
             return value;

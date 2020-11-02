@@ -31,7 +31,7 @@ export default class Button {
         ct.throwIfCancellationRequested();
         this.bgColor ? (ctx.fillStyle = this.bgColor) : 0;
         const rect = this.rectangle;
-        logger.log(Level.DEBUG, rect);
+        logger.debug(rect);
         this.radius
             ? roundRect(
                   ctx,
@@ -58,9 +58,9 @@ export default class Button {
         );
         ct.throwIfCancellationRequested();
         const clickPos = getCursorPosition(ctx.canvas, e);
-        logger.log(Level.DEBUG, clickPos);
+        logger.debug(clickPos);
         if (detectRectCollision(rect, new Rect2D(clickPos), 5)) {
-            logger.log(Level.DEBUG, `${this.id} clicked`);
+            logger.debug(`${this.id} clicked`);
             return this.id;
         } else {
             return await this.render(ctx, ct);

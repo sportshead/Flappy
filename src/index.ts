@@ -14,6 +14,7 @@ import CancellationTokenSource, {
 import getCursorPosition from "./canvas/getCursorPosition";
 import Rect2D from "./canvas/Rect2D";
 import Pipe, { PipeConstants } from "./Pipe";
+import BirdFacts from "./facts";
 
 export const logger = new Logger(
     new ConsoleLogOutput(
@@ -31,8 +32,8 @@ const canvas = <HTMLCanvasElement>document.getElementById("main");
 const ctx = canvas.getContext("2d");
 
 export const Bird: Rect2D = new Rect2D(20, 50, 32, 32);
-const gravity = 1; // gravity in pixels/frame, 60 fps
-const jumpHeight = 1.5; // pixels/frame
+const gravity = 1.5; // gravity in pixels/frame, 60 fps
+const jumpHeight = 2.5; // pixels/frame
 export const floorY = 475;
 let jumpCountDown = 0; // frames
 let jumping = false;
@@ -55,35 +56,38 @@ async function main() {
 
     document.fonts.add(await pressStart.load());
 
-    logger.log(Level.INFO, "font loaded");
+    logger.info("font loaded");
 
     images.set("bg", await Util.getImage(bg));
-    logger.log(Level.INFO, "bg loaded");
+    logger.info("bg loaded");
 
     images.set("bird", await Util.getImage(bird));
-    logger.log(Level.INFO, "bird loaded");
+    logger.info("bird loaded");
     images.set("bird_up", await Util.getImage(bird_up));
-    logger.log(Level.INFO, "bird_up loaded");
+    logger.info("bird_up loaded");
     images.set("bird_down", await Util.getImage(bird_down));
-    logger.log(Level.INFO, "bird_down loaded");
+    logger.info("bird_down loaded");
 
     images.set("pipe", await Util.getImage(pipe));
-    logger.log(Level.INFO, "pipe loaded");
+    logger.info("pipe loaded");
     images.set("pipe_up", await Util.getImage(pipe_up));
-    logger.log(Level.INFO, "pipe_up loaded");
+    logger.info("pipe_up loaded");
     images.set("pipe_down", await Util.getImage(pipe_down));
-    logger.log(Level.INFO, "pipe_down loaded");
+    logger.info("pipe_down loaded");
 
     canvas.addEventListener("click", (e) => {
         const click = getCursorPosition(canvas, e);
-        logger.log(Level.DEBUG, `Click detected at `, click);
+        logger.debug(`Click detected at `, click);
     });
-    logger.log(Level.TRACE, "Click listener added.");
+    logger.trace("Click listener added.");
 
     canvas.addEventListener("selectstart", (e) => {
         e.preventDefault();
     });
-    logger.log(Level.TRACE, "Selection disabled.");
+    logger.trace("Selection disabled.");
+
+    BirdFacts.init();
+    logger.trace("Bird facts initialized.");
 
     await Menus.MainMenu(ctx);
 
@@ -100,41 +104,46 @@ function bindJump(token: CancellationToken) {
             return;
         }
         e.preventDefault();
-        logger.log(Level.TRACE, "Jumped");
+        logger.debug("Jumped");
         jumpCountDown = 20;
     });
-    document.body.addEventListener("keydown", (e: KeyboardEvent) => {
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
         if (token.isCancellationRequested()) {
             return;
         }
-        if (e.key !== "Space") {
-            logger.log(Level.TRACE, "Jumping");
+        logger.debug("Keydown", e.code, "detected");
+        if (e.code === "Space") {
+            logger.debug("Jumping");
             jumping = true;
         }
     });
-    document.body.addEventListener("keyup", (e: KeyboardEvent) => {
+    document.addEventListener("keyup", (e: KeyboardEvent) => {
         if (token.isCancellationRequested()) {
             return;
         }
-        if (e.key !== "Space") {
-            logger.log(Level.TRACE, "Stopped jumping");
+        logger.debug("Keyup", e.code, "detected");
+        if (e.code === "Space") {
+            logger.debug("Stopped jumping");
             jumping = false;
         }
     });
-    canvas.addEventListener("touchstart", (e) => {
-        if (token.isCancellationRequested()) {
-            return;
-        }
-        e.preventDefault();
-        logger.log(Level.TRACE, "Jumping");
-        jumping = true;
-    });
+    canvas.addEventListener(
+        "touchstart",
+        (e) => {
+            if (token.isCancellationRequested()) {
+                return;
+            }
+            logger.debug("Jumping");
+            jumping = true;
+        },
+        { passive: true }
+    );
     canvas.addEventListener("touchend", (e) => {
         if (token.isCancellationRequested()) {
             return;
         }
         e.preventDefault();
-        logger.log(Level.TRACE, "Stopped jumping");
+        logger.debug("Stopped jumping");
         jumping = false;
     });
     canvas.addEventListener("touchcancel", (e) => {
@@ -142,14 +151,14 @@ function bindJump(token: CancellationToken) {
             return;
         }
         e.preventDefault();
-        logger.log(Level.TRACE, "Stopped jumping");
+        logger.debug("Stopped jumping");
         jumping = false;
     });
 }
 
 function draw() {
     if (Bird.y + Bird.height >= floorY) {
-        logger.log(Level.INFO, "game over, reason: floor");
+        logger.info("game over, reason: floor");
         return gameOver();
     }
 
@@ -160,7 +169,7 @@ function draw() {
     }
 
     if (--pipeCooldown <= 0) {
-        pipeCooldown = 150; // frames = 2 secs
+        pipeCooldown = 175; // frames = 2 secs
         pipes.push(new Pipe(600, Util.randomInt(floorY - 128, 128)));
     }
 
@@ -177,11 +186,11 @@ function draw() {
             pipe.render(ctx);
             // collision detection
             if (pipe.detectCollision(Bird, -10)) {
-                logger.log(Level.INFO, "game over, reason: pipe");
+                logger.info("game over, reason: pipe");
                 ded = true;
             }
             if (!pipe.passedThrough && Bird.x > pipe.x + PipeConstants.WIDTH) {
-                logger.log(Level.INFO, "Score increased");
+                logger.info("Score increased");
                 score++;
                 pipe.passedThrough = true;
             }
@@ -197,7 +206,7 @@ function draw() {
     );
 
     // draw bird on top of pipes
-    if (--jumpCountDown >= 10) {
+    if (--jumpCountDown >= 10 || jumping) {
         ctx.drawImage(images.get("bird_up"), Bird.x, Bird.y);
         Bird.y -= jumpHeight;
     } else if (jumpCountDown > 0) {
@@ -222,25 +231,27 @@ export function reset() {
 function gameOver() {
     JumpCST.cancel();
 
-    Menus.GameOverMenu(ctx).then(() => {
-        logger.log(Level.INFO, "Game restarted, resetting variables...");
+    Menus.GameOverMenu(ctx)
+        .then(() => {
+            logger.info("Game restarted, resetting variables...");
 
-        Bird.set(new Rect2D(20, 50, 32, 32));
+            Bird.set(new Rect2D(20, 50, 32, 32));
 
-        jumpCountDown = 0; // frames
-        pipeCooldown = 0; // frames
+            jumpCountDown = 0; // frames
+            pipeCooldown = 0; // frames
 
-        score = 0;
+            score = 0;
 
-        pipes.length = 0;
+            pipes.length = 0;
 
-        JumpCST = new CancellationTokenSource();
-        bindJump(JumpCST.getToken());
+            jumping = false;
 
-        logger.log(Level.INFO, "Game restarted successfully.");
+            JumpCST = new CancellationTokenSource();
+            bindJump(JumpCST.getToken());
 
-        window.requestAnimationFrame(draw);
-    });
+            logger.info("Game restarted successfully.");
+
+            window.requestAnimationFrame(draw);
+        })
+        .catch();
 }
-
-logger.log(Level.INFO, window.isSecureContext);

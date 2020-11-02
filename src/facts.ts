@@ -7,7 +7,7 @@ export default class BirdFacts {
     static init(): void {
         this.facts.set(
             "windows",
-            "Around 600 million birds die from crashing into windows every year, in the US alone."
+            "Around 600 million birds\ndie from crashing into\nwindows every year\nin the US alone."
         );
     }
 
