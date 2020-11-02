@@ -13,6 +13,25 @@ export default class Logger {
         const date = new Date();
         this.outputs.forEach((l) => l.log(date, level, ...messages));
     }
+
+    trace(...messages: any) {
+        this.log(Level.TRACE, ...messages);
+    }
+    debug(...messages: any) {
+        this.log(Level.DEBUG, ...messages);
+    }
+    info(...messages: any) {
+        this.log(Level.INFO, ...messages);
+    }
+    warn(...messages: any) {
+        this.log(Level.WARN, ...messages);
+    }
+    error(...messages: any) {
+        this.log(Level.ERROR, ...messages);
+    }
+    fatal(...messages: any) {
+        this.log(Level.FATAL, ...messages);
+    }
 }
 
 class StandardLevel {
